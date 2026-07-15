@@ -20,11 +20,13 @@ public class RuleBasedChatModel implements ChatModel {
     @Override
     public ModelDecision next(List<ChatMessage> messages, List<ToolDefinition> tools) {
         ChatMessage last = messages.get(messages.size() - 1);
+        // 工具刚返回 observation：模拟模型读取结果并生成最终答案。
         if (last.role() == ChatMessage.Role.TOOL) {
             return new ModelDecision.FinalAnswer("Result: " + last.content());
         }
         Matcher matcher = CALCULATE.matcher(last.content());
         if (matcher.find()) {
+            // 只产生调用意图，计算由受控的 CalculatorTool 完成。
             return new ModelDecision.ToolCall(UUID.randomUUID().toString(), "calculator",
                     Map.of("expression", matcher.group(1).trim()));
         }

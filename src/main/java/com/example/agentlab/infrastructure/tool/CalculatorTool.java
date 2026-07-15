@@ -10,12 +10,14 @@ import java.util.Map;
 
 @Component
 public class CalculatorTool implements AgentTool {
+    /** JSON Schema 会发给模型，告诉模型 calculator 需要哪些参数。 */
     public ToolDefinition definition() {
         return new ToolDefinition("calculator", "Evaluate basic arithmetic with +, -, *, / and parentheses",
                 "{\"type\":\"object\",\"properties\":{\"expression\":{\"type\":\"string\"}},\"required\":[\"expression\"]}");
     }
 
     public String execute(Map<String, Object> arguments) {
+        // 模型输出和用户输入一样不可信，执行前必须校验。
         Object raw = arguments.get("expression");
         if (!(raw instanceof String expression) || expression.isBlank()) {
             throw new IllegalArgumentException("expression must be a non-empty string");
@@ -23,6 +25,7 @@ public class CalculatorTool implements AgentTool {
         return new Parser(expression).parse().stripTrailingZeros().toPlainString();
     }
 
+    /** 递归下降解析器；expression/term/factor 三层实现算术优先级。 */
     private static final class Parser {
         private final String text;
         private int pos;
