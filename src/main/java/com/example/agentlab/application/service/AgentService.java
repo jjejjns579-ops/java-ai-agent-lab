@@ -1,8 +1,10 @@
-package com.example.agentlab.application;
+package com.example.agentlab.application.service;
 
-import com.example.agentlab.domain.ChatMessage;
-import com.example.agentlab.domain.ChatModel;
-import com.example.agentlab.domain.ModelDecision;
+import com.example.agentlab.application.port.out.ChatModel;
+import com.example.agentlab.application.port.out.ConversationStore;
+import com.example.agentlab.domain.model.ChatMessage;
+
+import com.example.agentlab.domain.model.ModelDecision;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

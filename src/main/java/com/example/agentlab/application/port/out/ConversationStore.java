@@ -1,6 +1,6 @@
-package com.example.agentlab.application;
+package com.example.agentlab.application.port.out;
 
-import com.example.agentlab.domain.ChatMessage;
+import com.example.agentlab.domain.model.ChatMessage;
 import java.util.List;
 
 public interface ConversationStore {

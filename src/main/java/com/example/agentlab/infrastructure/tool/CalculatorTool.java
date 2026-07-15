@@ -1,7 +1,7 @@
-package com.example.agentlab.infrastructure;
+package com.example.agentlab.infrastructure.tool;
 
-import com.example.agentlab.domain.AgentTool;
-import com.example.agentlab.domain.ToolDefinition;
+import com.example.agentlab.domain.tool.AgentTool;
+import com.example.agentlab.domain.tool.ToolDefinition;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;

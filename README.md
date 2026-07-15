@@ -1,32 +1,50 @@
-﻿# Java AI Agent Lab
+# Java AI Agent Lab
 
-闈㈠悜 Java 宸ョ▼甯堢殑 AI Agent 瀛︿範涓庝綔鍝侀泦椤圭洰銆傜涓€鐗堜笉闇€瑕?API Key锛氬唴缃鍒欐ā鍨嬶紝鐢ㄦ潵瑙傚療瀹屾暣鐨?Agent 鈫?Tool 鈫?Observation 鈫?Answer 寰幆銆?
-## 蹇€熷紑濮?
-瑕佹眰锛欽DK 21銆丮aven 3.6.3+銆?
+面向 Java 工程师的 AI Agent 学习与作品集项目。第一版不需要 API Key：内置规则模型，用来观察完整的 Agent → Tool → Observation → Answer 循环。
+
+## 快速开始
+
+要求：JDK 17+、Maven 3.6.3+。
+
 ```bash
 mvn test
 mvn spring-boot:run
 ```
 
-鍙﹀紑缁堢锛?
+请求示例：
+
 ```bash
 curl -X POST http://localhost:8080/api/agents/chat \
   -H "Content-Type: application/json" \
   -d '{"sessionId":"demo","message":"calculate 12 * (3 + 2)"}'
 ```
 
-涔熷彲浠ュ彂閫佹櫘閫氭枃鏈紝渚嬪 `hello agent`銆傚仴搴锋鏌ワ細`GET /actuator/health`銆?
-## 浣犳鍦ㄥ涔犱粈涔?
+健康检查：`GET /actuator/health`。
+
+## 代码结构
+
 ```text
-HTTP Request
-    鈫?AgentController 鈫?AgentService 鈫?ChatModel (绔彛)
-                         鈫?tool call
-                    ToolRegistry 鈫?AgentTool
-                         鈫?observation
-                    ChatModel 鈫?final answer
+com.example.agentlab
+├─ api
+│  ├─ controller    HTTP 接口适配
+│  ├─ dto           请求与响应对象
+│  └─ error         统一异常转换
+├─ application
+│  ├─ service       Agent 用例编排与工具注册
+│  └─ port/out      模型、存储等对外依赖接口
+├─ domain
+│  ├─ model         消息与模型决策
+│  └─ tool          工具协议
+└─ infrastructure
+   ├─ model         模型接口实现
+   ├─ persistence   会话存储实现
+   └─ tool          具体工具实现
 ```
 
-- `domain`锛氭秷鎭€佹ā鍨嬪喅绛栥€佸伐鍏峰崗璁紝瀹屽叏涓嶄緷璧?Spring 鍜屾ā鍨嬪巶鍟嗐€?- `application`锛欰gent 鐘舵€佹満銆佹渶澶ф鏁颁繚鎶ゃ€佷細璇濊蹇嗐€?- `infrastructure`锛氬綋鍓嶇殑瑙勫垯妯″瀷銆佽绠楀櫒宸ュ叿锛涙湭鏉ョ殑 OpenAI/鏈湴妯″瀷閫傞厤鍣ㄤ篃鏀捐繖閲屻€?- `api`锛欻TTP 杈撳叆杈撳嚭涓庨敊璇竟鐣屻€?
-璇︾粏璺嚎瑙?[docs/LEARNING_ROADMAP.md](docs/LEARNING_ROADMAP.md)锛岃凯浠ｄ换鍔¤ [docs/BACKLOG.md](docs/BACKLOG.md)銆?
-## 绗竴鏉￠噸瑕佸師鍒?
-Agent 涓嶆槸鈥滃涓€涓亰澶?SDK鈥濄€傚畠鏄竴涓彈鎺у惊鐜細妯″瀷鍐冲畾涓嬩竴姝ワ紝绋嬪簭鏍￠獙骞舵墽琛屽伐鍏凤紝鎶婄粨鏋滀綔涓?observation 浜よ繕妯″瀷锛岀洿鍒板緱鍒版渶缁堢瓟妗堟垨杈惧埌瀹夊叏杈圭晫銆?
+依赖方向是 `api/infrastructure → application → domain`。应用层只依赖端口接口，不依赖 DeepSeek、数据库等具体实现。
+
+详细路线见 [docs/LEARNING_ROADMAP.md](docs/LEARNING_ROADMAP.md)，迭代任务见 [docs/BACKLOG.md](docs/BACKLOG.md)。
+
+## 第一条重要原则
+
+Agent 不是“套一个聊天 SDK”。它是一个受控循环：模型决定下一步，程序校验并执行工具，把结果作为 observation 交还模型，直到得到最终答案或达到安全边界。

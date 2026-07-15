@@ -1,4 +1,4 @@
-package com.example.agentlab.infrastructure;
+package com.example.agentlab.infrastructure.tool;
 
 import org.junit.jupiter.api.Test;
 import java.util.Map;

@@ -1,7 +1,9 @@
-package com.example.agentlab.application;
+package com.example.agentlab.application.service;
 
-import com.example.agentlab.infrastructure.CalculatorTool;
-import com.example.agentlab.infrastructure.RuleBasedChatModel;
+import com.example.agentlab.infrastructure.model.RuleBasedChatModel;
+import com.example.agentlab.infrastructure.persistence.InMemoryConversationStore;
+import com.example.agentlab.infrastructure.tool.CalculatorTool;
+
 import org.junit.jupiter.api.Test;
 import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;

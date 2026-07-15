@@ -1,9 +1,10 @@
-package com.example.agentlab.infrastructure;
+package com.example.agentlab.infrastructure.model;
 
-import com.example.agentlab.domain.ChatMessage;
-import com.example.agentlab.domain.ChatModel;
-import com.example.agentlab.domain.ModelDecision;
-import com.example.agentlab.domain.ToolDefinition;
+import com.example.agentlab.application.port.out.ChatModel;
+import com.example.agentlab.domain.model.ChatMessage;
+
+import com.example.agentlab.domain.model.ModelDecision;
+import com.example.agentlab.domain.tool.ToolDefinition;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

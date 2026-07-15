@@ -1,4 +1,4 @@
-package com.example.agentlab.domain;
+package com.example.agentlab.domain.model;
 
 import java.util.Map;
 

@@ -1,6 +1,7 @@
-package com.example.agentlab.application;
+package com.example.agentlab.infrastructure.persistence;
 
-import com.example.agentlab.domain.ChatMessage;
+import com.example.agentlab.application.port.out.ConversationStore;
+import com.example.agentlab.domain.model.ChatMessage;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
