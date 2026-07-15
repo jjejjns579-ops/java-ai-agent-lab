@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/** 收集所有 AgentTool，并按名称提供白名单式调用入口。 */
 @Component
 public class ToolRegistry {
     private final Map<String, AgentTool> tools;
