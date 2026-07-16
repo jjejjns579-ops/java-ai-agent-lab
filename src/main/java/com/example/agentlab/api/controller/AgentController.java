@@ -2,6 +2,7 @@ package com.example.agentlab.api.controller;
 
 import com.example.agentlab.api.dto.ChatRequest;
 import com.example.agentlab.api.dto.ChatResponse;
+import com.example.agentlab.api.security.CurrentUser;
 import com.example.agentlab.application.service.AgentService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +21,7 @@ public class AgentController {
 
     @PostMapping("/chat")
     public ChatResponse chat(@Valid @RequestBody ChatRequest request) {
-        var result = agentService.chat(request.sessionId(), request.message());
+        var result = agentService.chat(CurrentUser.getUserId(), request.sessionId(), request.message());
         return new ChatResponse(request.sessionId(), result.answer(), result.steps());
     }
 }

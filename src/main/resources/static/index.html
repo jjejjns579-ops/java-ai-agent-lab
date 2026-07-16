@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agent Lab Debug</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f5f7fb;
+      color: #172033;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(180deg, rgba(33, 92, 255, 0.08), transparent 260px),
+        #f5f7fb;
+    }
+
+    main {
+      width: min(980px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0;
+    }
+
+    header {
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      line-height: 1.2;
+    }
+
+    p {
+      margin: 0;
+      color: #5f6b7c;
+      line-height: 1.6;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 0.85fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    section {
+      background: #ffffff;
+      border: 1px solid #dbe3ef;
+      border-radius: 8px;
+      padding: 18px;
+      box-shadow: 0 12px 32px rgba(20, 35, 65, 0.08);
+    }
+
+    label {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 14px;
+      font-weight: 650;
+      color: #24324a;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid #c8d2e1;
+      border-radius: 6px;
+      padding: 11px 12px;
+      font: inherit;
+      color: #172033;
+      background: #ffffff;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 116px;
+      resize: vertical;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: #2f6fed;
+      box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.16);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 6px;
+      padding: 11px 14px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .primary {
+      color: #ffffff;
+      background: #245fe0;
+    }
+
+    .secondary {
+      color: #24324a;
+      background: #edf2f8;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .metric {
+      border: 1px solid #dbe3ef;
+      border-radius: 6px;
+      padding: 12px;
+      background: #f8fafd;
+    }
+
+    .metric span {
+      display: block;
+      color: #627086;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .metric strong {
+      font-size: 18px;
+    }
+
+    pre {
+      min-height: 280px;
+      margin: 0;
+      padding: 14px;
+      border-radius: 6px;
+      overflow: auto;
+      background: #0f172a;
+      color: #dbeafe;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .hint {
+      margin-top: 14px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 780px) {
+      main {
+        width: min(100% - 20px, 980px);
+        padding: 20px 0;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .meta {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Agent Lab Debug</h1>
+    <p>用真实接口调试 Agent：Bearer token 只放在浏览器本地，不会被页面保存。</p>
+  </header>
+
+  <div class="layout">
+    <section>
+      <form id="chatForm">
+        <label>
+          JWT Bearer Token
+          <textarea id="token" placeholder="粘贴 JWT，不需要输入 Bearer 前缀"></textarea>
+        </label>
+
+        <label>
+          Session ID
+          <input id="sessionId" value="demo-session" autocomplete="off">
+        </label>
+
+        <label>
+          Message
+          <textarea id="message">calculate 12 * (3 + 2)</textarea>
+        </label>
+
+        <div class="actions">
+          <button class="primary" id="sendButton" type="submit">发送</button>
+          <button class="secondary" id="clearButton" type="button">清空响应</button>
+        </div>
+      </form>
+      <p class="hint">如果没有 token，接口应该返回 401；这是认证生效的正常表现。</p>
+    </section>
+
+    <section>
+      <div class="meta">
+        <div class="metric">
+          <span>HTTP 状态</span>
+          <strong id="status">-</strong>
+        </div>
+        <div class="metric">
+          <span>耗时</span>
+          <strong id="duration">-</strong>
+        </div>
+      </div>
+      <pre id="output">等待请求...</pre>
+    </section>
+  </div>
+</main>
+
+<script>
+  const form = document.querySelector("#chatForm");
+  const tokenInput = document.querySelector("#token");
+  const sessionInput = document.querySelector("#sessionId");
+  const messageInput = document.querySelector("#message");
+  const sendButton = document.querySelector("#sendButton");
+  const clearButton = document.querySelector("#clearButton");
+  const statusText = document.querySelector("#status");
+  const durationText = document.querySelector("#duration");
+  const output = document.querySelector("#output");
+
+  clearButton.addEventListener("click", () => {
+    statusText.textContent = "-";
+    durationText.textContent = "-";
+    output.textContent = "等待请求...";
+  });
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const token = tokenInput.value.trim().replace(/^Bearer\s+/i, "");
+    const payload = {
+      sessionId: sessionInput.value.trim(),
+      message: messageInput.value.trim()
+    };
+
+    if (!payload.sessionId || !payload.message) {
+      output.textContent = "sessionId 和 message 都不能为空。";
+      return;
+    }
+
+    const headers = {
+      "Content-Type": "application/json"
+    };
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    sendButton.disabled = true;
+    statusText.textContent = "...";
+    durationText.textContent = "...";
+    output.textContent = "请求中...";
+    const startedAt = performance.now();
+
+    try {
+      const response = await fetch("/api/agents/chat", {
+        method: "POST",
+        headers,
+        body: JSON.stringify(payload)
+      });
+      const duration = Math.round(performance.now() - startedAt);
+      const text = await response.text();
+
+      statusText.textContent = String(response.status);
+      durationText.textContent = `${duration} ms`;
+      output.textContent = formatBody(text);
+    } catch (error) {
+      statusText.textContent = "ERR";
+      durationText.textContent = `${Math.round(performance.now() - startedAt)} ms`;
+      output.textContent = error instanceof Error ? error.message : String(error);
+    } finally {
+      sendButton.disabled = false;
+    }
+  });
+
+  function formatBody(text) {
+    if (!text) return "(empty response)";
+    try {
+      return JSON.stringify(JSON.parse(text), null, 2);
+    } catch {
+      return text;
+    }
+  }
+</script>
+</body>
+</html>

@@ -14,7 +14,7 @@ class AgentServiceTest {
         var service = new AgentService(new RuleBasedChatModel(),
                 new ToolRegistry(List.of(new CalculatorTool())), new InMemoryConversationStore());
 
-        var result = service.chat("test-session", "calculate 12 * (3 + 2)");
+        var result = service.chat("test-user", "test-session", "calculate 12 * (3 + 2)");
 
         assertThat(result.answer()).contains("60");
         assertThat(result.steps()).isEqualTo(2);
